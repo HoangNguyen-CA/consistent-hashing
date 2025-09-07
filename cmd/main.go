@@ -10,7 +10,13 @@ import (
 func main() {
 	hr := hash.NewHashRing()
 	s1 := server.NewServer([]byte("s1"))
+	s2 := server.NewServer([]byte("s2"))
+	s3 := server.NewServer([]byte("s3"))
 	hr.AddServer(s1)
+	hr.AddServer(s2)
+	hr.AddServer(s3)
 
-	fmt.Println(hr.GetServer([]byte("s0")))
+	hr.PrintAllServers()
+
+	fmt.Printf("%s\n", hr.GetServer([]byte("5")).Id)
 }

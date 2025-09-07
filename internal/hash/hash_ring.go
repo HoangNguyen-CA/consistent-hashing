@@ -1,6 +1,7 @@
 package hash
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/HoangNguyen-CA/consistent-hashing/internal/server"
@@ -22,13 +23,22 @@ func (hr *HashRing) GetServer(id []byte) *server.Server {
 
 	it := hr.servers.Iterator()
 	for it.Valid() {
-		if h.Cmp(it.Key()) >= 0 {
+		fmt.Println(h, it.Key())
+		if h.Cmp(it.Key()) <= 0 {
 			return it.Value()
 		}
 		it.Next()
 	}
 
 	return hr.servers.Iterator().Value()
+}
+
+func (hr *HashRing) PrintAllServers() {
+	it := hr.servers.Iterator()
+	for it.Valid() {
+		fmt.Printf("Server %s stored at: %v\n", it.Value().Id, it.Key())
+		it.Next()
+	}
 }
 
 func NewHashRing() *HashRing {
