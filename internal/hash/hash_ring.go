@@ -14,8 +14,12 @@ type HashRing struct {
 }
 
 func (hr *HashRing) AddServer(server *server.Server) {
-	h := Hash(server.Id)
-	hr.servers.Set(h, server)
+	var i uint
+	for i = 0; i < hr.replicas; i++ {
+		sId := fmt.Sprintf("%v-%v", server.Id, i)
+		h := Hash([]byte(sId))
+		hr.servers.Set(h, server)
+	}
 }
 
 func (hr *HashRing) GetServer(id []byte) *server.Server {
@@ -23,7 +27,6 @@ func (hr *HashRing) GetServer(id []byte) *server.Server {
 
 	it := hr.servers.Iterator()
 	for it.Valid() {
-		fmt.Println(h, it.Key())
 		if h.Cmp(it.Key()) <= 0 {
 			return it.Value()
 		}
@@ -41,9 +44,9 @@ func (hr *HashRing) PrintAllServers() {
 	}
 }
 
-func NewHashRing() *HashRing {
+func NewHashRing(replicas uint) *HashRing {
 	tr := treemap.NewWithKeyCompare[*big.Int, *server.Server](func(a, b *big.Int) bool {
 		return a.Cmp(b) < 0
 	})
-	return &HashRing{servers: tr}
+	return &HashRing{servers: tr, replicas: replicas}
 }

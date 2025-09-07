@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	hr := hash.NewHashRing()
+	hr := hash.NewHashRing(3)
 	s1 := server.NewServer([]byte("s1"))
 	s2 := server.NewServer([]byte("s2"))
 	s3 := server.NewServer([]byte("s3"))
@@ -18,5 +18,7 @@ func main() {
 
 	hr.PrintAllServers()
 
-	fmt.Printf("%s\n", hr.GetServer([]byte("5")).Id)
+	for i := 0; i < 100; i++ {
+		fmt.Printf("%s\n", hr.GetServer([]byte(fmt.Sprint(i))).Id)
+	}
 }
