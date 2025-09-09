@@ -8,17 +8,35 @@ import (
 )
 
 func main() {
-	hr := hash.NewHashRing(3)
-	s1 := server.NewServer([]byte("s1"))
-	s2 := server.NewServer([]byte("s2"))
-	s3 := server.NewServer([]byte("s3"))
-	hr.AddServer(s1)
-	hr.AddServer(s2)
-	hr.AddServer(s3)
+	hr := hash.NewHashRing(100)
+	servers := setUpServers([]string{"s1", "s2", "s3"})
 
-	hr.PrintAllServers()
+	serverMap := make(map[string]int)
 
-	for i := 0; i < 100; i++ {
-		fmt.Printf("%s\n", hr.GetServer([]byte(fmt.Sprint(i))).Id)
+	for _, s := range servers {
+		hr.AddServer(s)
+		serverMap[s.Id] = 0
 	}
+
+	totalRequests := 100000
+
+	for i := 0; i < totalRequests; i++ {
+		routedServerId := hr.GetServer([]byte(fmt.Sprint(i))).Id
+		serverMap[routedServerId]++
+	}
+
+	for key, val := range serverMap {
+		fmt.Printf("Server %v got %v requests\n", key, val)
+	}
+}
+
+func setUpServers(serverIds []string) []*server.Server {
+	servers := []*server.Server{}
+
+	for _, serverId := range serverIds {
+		server := server.NewServer(serverId)
+		servers = append(servers, server)
+	}
+
+	return servers
 }
