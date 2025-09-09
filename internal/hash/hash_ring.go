@@ -13,6 +13,7 @@ type HashRing struct {
 	replicas uint
 }
 
+// Adds n replicas to the hash ring, where n is specified by hr.replicas
 func (hr *HashRing) AddServer(server *server.Server) {
 	var i uint
 	for i = 0; i < hr.replicas; i++ {
@@ -22,8 +23,9 @@ func (hr *HashRing) AddServer(server *server.Server) {
 	}
 }
 
-func (hr *HashRing) GetServer(id []byte) *server.Server {
-	h := Hash(id)
+// Returns the server given a request id
+func (hr *HashRing) GetServer(rid []byte) *server.Server {
+	h := Hash(rid)
 
 	it := hr.servers.Iterator()
 	for it.Valid() {
@@ -45,6 +47,10 @@ func (hr *HashRing) PrintAllServers() {
 }
 
 func NewHashRing(replicas uint) *HashRing {
+	if replicas == 0 {
+		panic("replicas must be > 0")
+	}
+
 	tr := treemap.NewWithKeyCompare[*big.Int, *server.Server](func(a, b *big.Int) bool {
 		return a.Cmp(b) < 0
 	})
